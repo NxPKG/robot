@@ -1,0 +1,118 @@
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod download
+    # you may remove this if you don't need go generate
+    - go generate ./...
+builds:
+  - id: robot
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/labring/robot/pkg/version.gitVersion={{.Version}}
+      - -X github.com/labring/robot/pkg/version.gitCommit={{.ShortCommit}}
+      - -X github.com/labring/robot/pkg/version.buildDate={{.Date}}
+
+
+#archives:
+#  - replacements:
+#      darwin: darwin
+#      linux: linux
+#      windows: windows
+#      amd64: amd64
+#      arm64: arm64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^test:'
+      - '^chore'
+      - 'merge conflict'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+      - go mod tidy
+  groups:
+    - title: Dependency updates
+      regexp: '^.*?(feat|fix)\(deps\)!?:.+$'
+      order: 300
+    - title: 'New Features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 100
+    - title: 'Security updates'
+      regexp: '^.*?sec(\([[:word:]]+\))??!?:.+$'
+      order: 150
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 200
+    - title: 'Documentation updates'
+      regexp: ^.*?doc(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: 'Build process updates'
+      regexp: ^.*?build(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: Other work
+      order: 9999
+
+release:
+  prerelease: auto
+  header: |
+    ## labring: robot {{ .Tag }}
+    We are excited to present to you the latest tool from labring: robot {{ .Tag }}! Gh-robot is a powerful automation tool designed specifically for GitHub repositories, with features such as handling issue and PR comments, automatic publishing, and auto-generating changelog files. In this article, we will provide a brief introduction to the main features of robot and how to obtain the corresponding Docker image.
+
+    ## Usage Instructions
+  
+    robot is a powerful tool that can help you effortlessly handle issue and PR comments in your GitHub repositories while also automatically publishing and generating changelog files. To start using robot, you first need to download the precompiled binary file suitable for your operating system. You can find these files on our [GitHub Releases page](https://github.com/labring/robot/releases).
+  
+    ### Installation
+  
+    1. Download the precompiled binary file suitable for your operating system.
+    2. Unzip the binary file and place it in your `PATH`.
+
+    ### Usage
+
+    In the command line, run the following command to start robot:
+  
+    ```bash
+    robot [OPTIONS]
+    ```
+  
+    `OPTIONS` can include the following parameters:
+  
+       - `--help`: Display help information.
+       - `--version`: Display the version information of robot.
+       - Other optional parameters.
+
+    ## Docker Image
+
+    For added convenience, we also provide a Docker image for robot. You can obtain the image with the following command:
+
+    ```bash
+    docker pull ghcr.io/labring/robot:{{ .Tag }}
+    ```
+
+    To run the robot Docker container, use the following command:
+
+    ```bash
+    docker run --rm -it ghcr.io/labring/robot:{{ .Tag }} [OPTIONS]
+    ```
+  
+    Here, `OPTIONS` are the options you want to pass to robot.
+
+  footer: |
+    **Full Changelog**: https://github.com/{{ .Env.USERNAME }}/robot/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+    * * *
+    
+    Thank you for your interest and support in labring and robot! If you encounter any problems during use, please feel free to submit an issue in our [GitHub repository](https://github.com/labring/robot). We will resolve your issue as soon as possible.

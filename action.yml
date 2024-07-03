@@ -1,0 +1,23 @@
+name: "Robot for Sealos"
+description: "Add some robot command for sealos"
+author: "cuisongliu"
+inputs:
+  version:
+    description: 'version of robot'
+    required: true
+    default: 'v2.0.0'
+runs:
+  using: "composite"
+  steps:
+  - run: |
+      sudo wget -q https://github.com/labring/robot/releases/download/${ROBOT_VERSION}/robot_${ROBOT_VERSION#v}_linux_amd64.tar.gz
+      sudo tar -zxf robot_${ROBOT_VERSION#v}_linux_amd64.tar.gz robot &&  chmod +x robot && sudo mv robot /usr/bin/robot
+      robot version
+      sudo rm -rf robot_${ROBOT_VERSION#v}_linux_amd64.tar.gz
+      robot action
+    shell: bash
+    env:
+      ROBOT_VERSION: ${{ inputs.version }}
+branding:
+  icon: 'user-check'
+  color: 'orange'

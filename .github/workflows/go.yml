@@ -1,0 +1,32 @@
+name: GO
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "*" ]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.20.x
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v1
+        with:
+          version: latest
+          args: build --snapshot --clean  --timeout=1h
+      - name: Copy file
+        run: |
+          cp dist/robot_linux_amd64_v1/robot  robot
+      - name: Expose git commit data
+        uses: rlespinasse/git-commit-data-action@v1

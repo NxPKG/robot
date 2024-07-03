@@ -1,0 +1,23 @@
+name: Deploy to cloud
+
+on:
+  workflow_dispatch:
+    inputs:
+      imageTag:
+        required: true
+      deployment:
+        required: true
+        default: webhook-actions
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to cluster
+        uses: ThomasKliszowski/setup-kubectl@v1
+        with:
+          kube-config: ${{ secrets.CLOUD_KUBECONFIG_BASE64 }}
+          kube-version: 1.24.0
+      - name: Run set image
+        run: |
+          kubectl set image deployment/${{ github.event.inputs.deployment }} *=ghcr.io/${{ github.repository_owner }}/robot:${{ github.event.inputs.imageTag }}
